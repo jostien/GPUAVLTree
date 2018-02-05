@@ -16,57 +16,29 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#include <stdio.h>
 
-/*
-    //Initialization
-    //--------------
+#define true 1
+#define false 0
 
-    //Something like
-
-    __local int keys[512];
-    __local int lefts[512];
-    __local int rights[512];
-    __local int heights[512];
-    __local int frees[512];
-    __local int used[512];
-    __local int size[1];
-    __local int root[1];
-
-    // worst case height of avl-tree is 1.44*log2(n + 2) - 0.328, e.g., 1.44*log2(512 + 2) - 0.328 = 12.64;
-    __local int p_stack[13];
-    __local int lr_stack[13];
-    __local int p_stack2[13];
-
-    clear(keys, 512);
-    clear(lefts, 512);
-    clear(rights, 512);
-    clear(heights, 512);
-
-    for (int i = 0; i < 512; i++)
-        frees[i] = i;
-
-    size[0] = 0;
-    root[0] = -1;
-*/
-
-int height(int p, __local int *heights)
+int height(int p, int *heights)
 {
     return p > -1 ? heights[p] : 0;
 }
 
-int bfactor(int p, __local int *lefts, __local int *rights, __local int *heights)
+int bfactor(int p, int *lefts, int *rights, int *heights)
 {
     return height(rights[p], heights)-height(lefts[p], heights);
 }
 
-void fixheight(int p, __local int *lefts, __local int *rights, __local int *heights)
+void fixheight(int p, int *lefts, int *rights, int *heights)
 {
     int hl = height(lefts[p], heights);
     int hr = height(rights[p], heights);
     heights[p] = (hl > hr ? hl : hr) + 1;
 }
 
-int rotateright(int p, __local int *lefts, __local int *rights, __local int *heights)
+int rotateright(int p, int *lefts, int *rights, int *heights)
 {
     int q = lefts[p];
     lefts[p] = rights[q];
@@ -76,7 +48,7 @@ int rotateright(int p, __local int *lefts, __local int *rights, __local int *hei
     return q;
 }
 
-int rotateleft(int q, __local int *lefts, __local int *rights, __local int *heights)
+int rotateleft(int q, int *lefts, int *rights, int *heights)
 {
     int p = rights[q];
     rights[q] = lefts[p];
@@ -86,7 +58,7 @@ int rotateleft(int q, __local int *lefts, __local int *rights, __local int *heig
     return p;
 }
 
-int balance(int p, __local int *lefts, __local int *rights, __local int *heights) // balancing the p node
+int balance(int p, int *lefts, int *rights, int *heights) // balancing the p node
 {
     fixheight(p, lefts, rights, heights);
     if(bfactor(p, lefts, rights, heights) == 2)
@@ -104,7 +76,7 @@ int balance(int p, __local int *lefts, __local int *rights, __local int *heights
     return p; // balancing is not required
 }
 
-int contains(int p, int k, __local int *keys, __local int *lefts, __local int *rights)
+int contains(int p, int k, int *keys, int *lefts, int *rights)
 {
     while (p > -1){
         if (k == keys[p])
@@ -118,7 +90,7 @@ int contains(int p, int k, __local int *keys, __local int *lefts, __local int *r
     return false;
 }
 
-int insert(int p, int k, __local int *size, int n, __local int *keys, __local int *lefts, __local int *rights, __local int *heights, __local int *frees, __local int *used, __local int *p_stack, __local int *lr_stack) // insert k key in a tree with p root
+int insert(int p, int k, int *size, int n, int *keys, int *lefts, int *rights, int *heights, int *frees, int *used, int *p_stack, int *lr_stack) // insert k key in a tree with p root
 {
     int root = p;
 
@@ -161,14 +133,14 @@ int insert(int p, int k, __local int *size, int n, __local int *keys, __local in
     return ret;
 }
 
-int findmin(int p, __local int *lefts) // find a node with minimal key in a p tree
+int findmin(int p, int *lefts) // find a node with minimal key in a p tree
 {
     while (lefts[p] > -1)
         p = lefts[p];
     return p;
 }
 
-int removemin(int p, __local int *lefts, __local int *rights, __local int *heights, __local int *p_stack) // deleting a node with minimal key from a p tree
+int removemin(int p, int *lefts, int *rights, int *heights, int *p_stack) // deleting a node with minimal key from a p tree
 {
     int stack_size = 0;
     while (lefts[p] > -1){
@@ -188,7 +160,7 @@ int removemin(int p, __local int *lefts, __local int *rights, __local int *heigh
     return ret;
 }
 
-int remove(int p, int k, __local int *size, int n, __local int *keys, __local int *lefts, __local int *rights, __local int *heights, __local int *frees, __local int *used, __local int *p_stack, __local int *lr_stack, __local int *p_stack2) // deleting k key from p tree
+int remove_(int p, int k, int *size, int n, int *keys, int *lefts, int *rights, int *heights, int *frees, int *used, int *p_stack, int *lr_stack, int *p_stack2) // deleting k key from p tree
 {
     int root = p;
 
@@ -250,7 +222,52 @@ int remove(int p, int k, __local int *size, int n, __local int *keys, __local in
     return ret;
 }
 
-void clear(__local int *array, int n){
+void clear(int *array, int n){
     for (int i = 0; i < n; i++)
         array[i] = -1;
 }
+
+main()
+{
+    int keys[512];
+    int lefts[512];
+    int rights[512];
+    int heights[512];
+    int frees[512];
+    int used[512];
+    int size[1];
+    int root[1];
+
+    // worst case height of avl-tree is 1.44*log2(n + 2) - 0.328, e.g., 1.44*log2(512 + 2) - 0.328 = 12.64;
+    int p_stack[13];
+    int lr_stack[13];
+    int p_stack2[13];
+
+    clear(keys, 512);
+    clear(lefts, 512);
+    clear(rights, 512);
+    clear(heights, 512);
+
+    for (int i = 0; i < 512; i++)
+        frees[i] = i;
+
+    size[0] = 0;
+    root[0] = -1;
+
+    root[0] = insert(root[0],  5, size, 512, keys, lefts, rights, heights, frees, used, p_stack, lr_stack);
+    root[0] = insert(root[0],  1, size, 512, keys, lefts, rights, heights, frees, used, p_stack, lr_stack);
+    root[0] = insert(root[0], 25, size, 512, keys, lefts, rights, heights, frees, used, p_stack, lr_stack);
+    root[0] = insert(root[0],  7, size, 512, keys, lefts, rights, heights, frees, used, p_stack, lr_stack);
+    root[0] = insert(root[0], 23, size, 512, keys, lefts, rights, heights, frees, used, p_stack, lr_stack);
+    root[0] = insert(root[0], 17, size, 512, keys, lefts, rights, heights, frees, used, p_stack, lr_stack);
+    root[0] = insert(root[0], 10, size, 512, keys, lefts, rights, heights, frees, used, p_stack, lr_stack);
+    root[0] = insert(root[0],  1, size, 512, keys, lefts, rights, heights, frees, used, p_stack, lr_stack);
+    root[0] = insert(root[0],  2, size, 512, keys, lefts, rights, heights, frees, used, p_stack, lr_stack);
+
+    root[0] = remove_(root[0], 5, size, 512, keys, lefts, rights, heights, frees, used, p_stack, lr_stack, p_stack2);
+    root[0] = remove_(root[0], 7, size, 512, keys, lefts, rights, heights, frees, used, p_stack, lr_stack, p_stack2);
+    root[0] = remove_(root[0], 1, size, 512, keys, lefts, rights, heights, frees, used, p_stack, lr_stack, p_stack2);
+
+    return 0;
+}
+
