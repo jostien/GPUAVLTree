@@ -13,4 +13,4 @@ Code from code.c can be put into kernel.cl.
 
 ## Recursive verion
 
-More information about recursive AVL-Tree implementation, see [this](http://kukuruku.co/hub/cpp/avl-trees).
+For more information about recursive AVL-Tree implementation, see [this](http://kukuruku.co/hub/cpp/avl-trees).
